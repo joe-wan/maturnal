@@ -1,7 +1,7 @@
 #ifndef PROGRESS_H
 #define PROGRESS_H
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 class Progress {

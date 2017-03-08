@@ -13,7 +13,7 @@
 
 /* This class is a parent to bayesian, knn.  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "database.hpp"
 #include "phylotree.h"
 

@@ -1,10 +1,10 @@
-#ifndef MOTHUR_H
-#define MOTHUR_H
+#ifndef MATURNAL_H
+#define MATURNAL_H
 
 
 
 /*
- *  mothur.h
+ *  maturnal.h
  *  Mothur
  *
  *  Created by Sarah Westcott on 2/19/09.
@@ -33,7 +33,7 @@
 //exception
 #include <stdexcept>
 #include <exception>
-#include <cstdlib> 
+#include <cstdlib>
 
 
 //containers
@@ -70,7 +70,7 @@
     #include <sys/sysctl.h>
 	#include <unistd.h>
 
-	
+
 	#ifdef USE_READLINE
 		#include <readline/readline.h>
 		#include <readline/history.h>
@@ -105,7 +105,7 @@ struct IntNode {
 	int rcoef;
 	IntNode* left;
 	IntNode* right;
-	
+
 	IntNode(int lv, int rv, IntNode* l, IntNode* r) : lvalue(lv), rvalue(rv), left(l), right(r) {};
 	IntNode() {};
 };
@@ -119,7 +119,7 @@ struct ThreadNode {
 struct diffPair {
 	float	prob;
 	float	reverseProb;
-	
+
 	diffPair() {
 		prob = 0; reverseProb = 0;
 	}
@@ -132,7 +132,7 @@ struct diffPair {
 struct item {
     string name;
     string group;
-    
+
     item() {}
     item(string n, string g) : name(n), group(g) {}
     ~item() {}
@@ -173,7 +173,7 @@ struct CommonHeader {
 	int flogramFormatCode;
 	string flowChars; //length depends on number flow reads
 	string keySequence; //length depends on key length
-	
+
 	CommonHeader(){ magicNumber=0; indexOffset=0; indexLength=0; numReads=0; headerLength=0; keyLength=0; numFlowsPerRead=0; flogramFormatCode='s'; }
 	~CommonHeader() { }
 };
@@ -190,7 +190,7 @@ struct Header {
 	string timestamp;
 	string region;
 	string xy;
-	
+
 	Header() { headerLength=0; nameLength=0; numBases=0; clipQualLeft=0; clipQualRight=0; clipAdapterLeft=0; clipAdapterRight=0; }
 	~Header() { }
 };
@@ -200,7 +200,7 @@ struct seqRead {
 	vector<unsigned int> flowIndex;
 	string bases;
 	vector<unsigned int> qualScores;
-	
+
 	seqRead() { }
 	~seqRead() { }
 };
@@ -262,13 +262,13 @@ struct seqDist {
 struct distlinePair {
 	int start;
 	int end;
-	
+
 };
 /************************************************************/
 struct oligosPair {
 	string forward;
 	string reverse;
-	
+
 	oligosPair() { forward = ""; reverse = "";  }
 	oligosPair(string f, string r) : forward(f), reverse(r) {}
 	~oligosPair() {}
@@ -296,16 +296,16 @@ struct compGroup {
 struct spearmanRank {
 	string name;
 	float score;
-	
+
 	spearmanRank(string n, float s) : name(n), score(s) {}
 };
 //***********************************************************************
 inline bool compareIndexes(PDistCell left, PDistCell right){
-	return (left.index > right.index);	
+	return (left.index > right.index);
 }
 //********************************************************************************************************************
 inline bool compareSpearman(spearmanRank left, spearmanRank right){
-	return (left.score < right.score);	
+	return (left.score < right.score);
 }
 //********************************************************************************************************************
 inline double max(double left, double right){
@@ -333,18 +333,18 @@ inline bool compareSeqPriorityNodes(seqPriorityNode left, seqPriorityNode right)
         if (left.seq > right.seq) { return true; }
         else { return false; }
     }
-    return false;	
-} 
- 
+    return false;
+}
+
 /************************************************************/
 //sorts lowest to highest
 inline bool compareDistLinePairs(distlinePair left, distlinePair right){
-	return (left.end < right.end);	
-} 
+	return (left.end < right.end);
+}
 //********************************************************************************************************************
 //sorts lowest to highest
 inline bool compareSequenceDistance(seqDist left, seqDist right){
-	return (left.dist < right.dist);	
+	return (left.dist < right.dist);
 }
 //********************************************************************************************************************
 //returns sign of double
@@ -366,12 +366,12 @@ public:
 //**********************************************************************************************************************
 template<typename T>
 void convert(const string& s, T& x, bool failIfLeftoverChars = true){
-	
+
 		istringstream i(s);
 		char c;
 		if (!(i >> x) || (failIfLeftoverChars && i.get(c)))
 			throw BadConversion(s);
-	
+
 }
 //**********************************************************************************************************************
 template <typename T> int sgn(T val){ return (val > T(0)) - (val < T(0)); }
@@ -379,65 +379,65 @@ template <typename T> int sgn(T val){ return (val > T(0)) - (val < T(0)); }
 
 template<typename T>
 bool convertTestFloat(const string& s, T& x, bool failIfLeftoverChars = true){
-	
+
 		istringstream i(s);
 		char c;
 		if (!(i >> x) || (failIfLeftoverChars && i.get(c)))
 		{
 			return false;
-		} 
+		}
 		return true;
-	
+
 }
 
 //**********************************************************************************************************************
 
 template<typename T>
 bool convertTest(const string& s, T& x, bool failIfLeftoverChars = true){
-	
+
 		istringstream i(s);
 		char c;
 		if (!(i >> x) || (failIfLeftoverChars && i.get(c)))
 		{
 			return false;
-		} 
+		}
 		return true;
-	
+
 }
 //**********************************************************************************************************************
 template<typename T>
 string toString(const T&x){
-	
+
 		stringstream output;
 		output << x;
 		return output.str();
-	
+
 }
 
 //**********************************************************************************************************************
 
 template<typename T>
 string toHex(const T&x){
-	
+
 		stringstream output;
-		
+
 		output << hex << x;
 
 		return output.str();
-	
+
 }
 //**********************************************************************************************************************
 
 template<typename T>
 string toString(const T&x, int i){
-	
+
 		stringstream output;
-		
+
 		output.precision(i);
 		output << fixed << x;
-		
+
 		return output.str();
-	
+
 }
 //**********************************************************************************************************************
 
@@ -452,4 +452,3 @@ T fromString(const string& s){
 //**********************************************************************************************************************
 
 #endif
-

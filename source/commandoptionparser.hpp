@@ -1,7 +1,7 @@
 #ifndef COMMANDOPTIONPARSER_HPP
 #define COMMANDOPTIONPARSER_HPP
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 //**********************************************************************************************************************

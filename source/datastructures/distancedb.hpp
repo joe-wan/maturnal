@@ -11,7 +11,7 @@
  */
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "dist.h"
 
 class DistanceDB : public Database {

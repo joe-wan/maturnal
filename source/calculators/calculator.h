@@ -2,7 +2,7 @@
 #define CALCULATOR_H
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "sabundvector.hpp"
 #include "sharedsabundvector.h"
 #include "rabundvector.hpp"

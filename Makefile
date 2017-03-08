@@ -1,6 +1,6 @@
 ###################################################
 #
-# Makefile for mothur
+# Makefile for maturnal
 #
 ###################################################
 
@@ -55,7 +55,7 @@ ifeq  ($(strip $(USEBOOST)),yes)
 endif
 
 #
-# INCLUDE directories for mothur
+# INCLUDE directories for maturnal
 #
 #
     VPATH=source/calculators:source/classifier:source/commands:source/datastructures
@@ -75,10 +75,10 @@ endif
     OBJECTS+=$(patsubst %.cpp,%.o,$(wildcard *.cpp))
     OBJECTS+=$(patsubst %.c,%.o,$(wildcard *.c))
 
-mothur : $(OBJECTS)
+maturnal : $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(TARGET_ARCH) -o $@ $(OBJECTS) $(LIBS)
 
-install : mothur
+install : maturnal
 
 
 %.o : %.c %.h
