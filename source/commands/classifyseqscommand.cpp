@@ -121,34 +121,12 @@ ClassifySeqsCommand::ClassifySeqsCommand(){
 	}
 }
 //**********************************************************************************************************************
-ClassifySeqsCommand::ClassifySeqsCommand(string option)  {
-	try {
-		abort = false; calledHelp = false;
-		hasName = false; hasCount=false;
-
-		//allow user to run help
-		if(option == "help") { help(); abort = true; calledHelp = true; }
-		else if(option == "citation") { citation(); abort = true; calledHelp = true;}
-
-		else {
-			OptionParser parser(option);
-			map<string, string> parameters = parser.getParameters();
-			loadParameters(parameters);
-        }
-	}
-	catch(exception& e) {
-		m->errorOut(e, "ClassifySeqsCommand", "ClassifySeqsCommand");
-		exit(1);
-	}
-}
 
 ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
-	loadParameters(parameters);
-}
-
-void ClassifySeqsCommand::loadParameters(map<string, string> parameters) {
+	abort = false; calledHelp = false;
+	hasName = false; hasCount=false;
+	
 	vector<string> myArray = setParameters();
-
 
 	ValidParameters validParameter("classify.seqs");
 	map<string, string>::iterator it;
