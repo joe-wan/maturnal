@@ -10,11 +10,9 @@ namespace jwutil {
 		// Evaluate argument pairs
 		for (int i = 1; i < argc; i += 2) {
 			string a = argv[i];
-			if (i + 1 >= argc) {
-				throw string("ERROR: you must include pairs of argument names and ") +
-					"values (e.g. maturnal --ARGUMENT1 VALUE1 --ARGUMENT2 VALUE2)";
-			}
-			string b = argv[i+1];
+			// Insert a blank if number of arguments is odd
+			string b = (i + 1 < argc) ? argv[i+1] : "";
+			
 			// Make sure a starts with the argument prefix
 			if (a.compare(0, ARG_NAME_PREFIX.size(), ARG_NAME_PREFIX) != 0) {
 				throw "ERROR: expected argument name with " + ARG_NAME_PREFIX +

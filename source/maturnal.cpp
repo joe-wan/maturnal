@@ -33,12 +33,25 @@ int main(int argc, char *argv[]){
 	} catch (string message) {
 		m->mothurOut(message);
 		m->mothurOutEndLine();
+		m->mothurOut("Use \"maturnal --help\" to see a list of options.");
+		m->mothurOutEndLine();
 		return 1;
 	}
 
-	// Classify the sequences
-	ClassifySeqsCommand command = ClassifySeqsCommand(parameters);
-	command.execute();
+	// See if user has requested help, citation, or execution
+	if (parameters.count("help") > 0) {
+		// Print help
+		m->mothurOut(ClassifySeqsCommand().getHelpString());
+		m->mothurOutEndLine();
+	} else if (parameters.count("citation") > 0) {
+		// Print citation
+		m->mothurOut(ClassifySeqsCommand().getCitation());
+		m->mothurOutEndLine();
+	} else {
+		// Classify the sequences
+		ClassifySeqsCommand command = ClassifySeqsCommand(parameters);
+		command.execute();
+	}
 
 	return 0;
 }
