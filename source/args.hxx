@@ -1581,7 +1581,7 @@ namespace args
         typename Reader = ValueReader<T>>
     class ValueFlag : public ValueFlagBase
     {
-        private:
+        protected:
             T value;
             Reader reader;
 

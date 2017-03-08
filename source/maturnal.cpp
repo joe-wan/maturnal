@@ -10,9 +10,9 @@
 #include "maturnal.h"
 #include "mothurout.h"
 
-#include "jwutil.hpp"
 #include "classifyseqscommand.h"
 #include "args.hxx"
+#include "jwargs.hpp"
 
 /**************************************************************************************************/
 
@@ -75,12 +75,12 @@ int main(int argc, char *argv[]){
 		"", {"output_matchdist"});
 
 	args::Group classifyGroup(parser, "Classification method:");
-	args::ValueFlag<string> methodF(classifyGroup, "METHOD",
-	"Classification method to use. Options are: wang, knn and zap. Default: wang",
-	{"method"});
-	args::ValueFlag<string> searchF(classifyGroup, "SEARCH",
+	jwargs::ChoiceFlag methodF(classifyGroup, "METHOD",
+		"Classification method to use. Options are: wang, knn and zap. Default: wang",
+		{"method"}, {"wang", "knn", "zap"}, "wang");
+	jwargs::ChoiceFlag searchF(classifyGroup, "SEARCH",
 		"The method to find most similar template. Options are: suffix, kmer, blast, align, distance. Default: kmer",
-		{"search"});
+		{"search"}, {"suffix", "kmer", "blast", "align", "distance"}, "kmer");
 	args::ValueFlag<int> ksizeF(classifyGroup, "KSIZE",
 		"If --method is set to kmer, this option specifies kmer length. Default: 8",
 		{"ksize"}, 8);
@@ -120,11 +120,13 @@ int main(int argc, char *argv[]){
 	    std::cout << parser;
 	    return 0;
 	} catch (args::ParseError e) {
-	    std::cerr << e.what() << std::endl;
+			std::cerr << "ERROR: could not parse input." << std::endl;
+	    std::cerr << e.what() << std::endl << std::endl;
 	    std::cerr << parser;
 	    return 1;
 	} catch (args::ValidationError e) {
-	    std::cerr << e.what() << std::endl;
+			std::cerr << "ERROR: invalid options." << std::endl;
+	    std::cerr << e.what() << std::endl << std::endl;
 	    std::cerr << parser;
 	    return 1;
 	}
@@ -149,7 +151,7 @@ int main(int argc, char *argv[]){
 	float gapopen = args::get(gapopenF);
 	float gapextend = args::get(gapextendF);
 
-	
+
 
 	cout << "fasta\t" << fasta << endl;
 	cout << "taxonomy\t" << taxonomy << endl;
