@@ -9,201 +9,65 @@
 
 #include "classifyseqscommand.h"
 
-
-
-//**********************************************************************************************************************
-vector<string> ClassifySeqsCommand::setParameters(){
-	try {
-		CommandParameter ptaxonomy("taxonomy", "InputTypes", "", "", "none", "none", "none","",false,true,true); parameters.push_back(ptaxonomy);
-		CommandParameter ptemplate("reference", "InputTypes", "", "", "none", "none", "none","",false,true,true); parameters.push_back(ptemplate);
-		CommandParameter pfasta("fasta", "InputTypes", "", "", "none", "none", "none","taxonomy",false,true,true); parameters.push_back(pfasta);
-		CommandParameter pname("name", "InputTypes", "", "", "NameCount", "none", "none","",false,false,true); parameters.push_back(pname);
-		CommandParameter poutput("output", "Multiple", "simple-detail", "detail", "", "", "","",false,false, true); parameters.push_back(poutput);
-		CommandParameter psearch("search", "Multiple", "kmer-blast-suffix-distance-align", "kmer", "", "", "","",false,false); parameters.push_back(psearch);
-		CommandParameter pksize("ksize", "Number", "", "8", "", "", "","",false,false); parameters.push_back(pksize);
-		CommandParameter pmethod("method", "Multiple", "wang-knn-zap", "wang", "", "", "","",false,false); parameters.push_back(pmethod);
-		CommandParameter pprocessors("processors", "Number", "", "1", "", "", "","",false,false,true); parameters.push_back(pprocessors);
-		CommandParameter pmatch("match", "Number", "", "1.0", "", "", "","",false,false); parameters.push_back(pmatch);
-		CommandParameter pprintlevel("printlevel", "Number", "", "-1", "", "", "","",false,false); parameters.push_back(pprintlevel);
-		CommandParameter pmismatch("mismatch", "Number", "", "-1.0", "", "", "","",false,false); parameters.push_back(pmismatch);
-		CommandParameter pgapopen("gapopen", "Number", "", "-2.0", "", "", "","",false,false); parameters.push_back(pgapopen);
-		CommandParameter pgapextend("gapextend", "Number", "", "-1.0", "", "", "","",false,false); parameters.push_back(pgapextend);
-		CommandParameter pcutoff("cutoff", "Number", "", "80", "", "", "","",false,true); parameters.push_back(pcutoff);
-		CommandParameter pprobs("probs", "Boolean", "", "T", "", "", "","",false,false); parameters.push_back(pprobs);
-		CommandParameter piters("iters", "Number", "", "100", "", "", "","",false,true); parameters.push_back(piters);
-		CommandParameter pnumwanted("numwanted", "Number", "", "10", "", "", "","",false,true); parameters.push_back(pnumwanted);
-		CommandParameter pseed("seed", "Number", "", "0", "", "", "","",false,false); parameters.push_back(pseed);
-		CommandParameter outtax("outtax", "String", "", "", "", "", "","",false,true,true); parameters.push_back(outtax);
-		CommandParameter outaccnos("outaccnos", "String", "", "", "", "", "","",false,false); parameters.push_back(outaccnos);
-		CommandParameter outmatchdist("outmatchdist", "String", "", "", "", "", "","",false,false); parameters.push_back(outmatchdist);
-		vector<string> myArray;
-		for (int i = 0; i < parameters.size(); i++) {	myArray.push_back(parameters[i].name);		}
-		return myArray;
-	}
-	catch(exception& e) {
-		m->errorOut(e, "ClassifySeqsCommand", "setParameters");
-		exit(1);
-	}
-}
-//**********************************************************************************************************************
-string ClassifySeqsCommand::getHelpString(){
-	try {
-		string helpString = "";
-		helpString += "The classify.seqs command reads a fasta file containing sequences and creates a .taxonomy file and a .tax.summary file.\n";
-		helpString += "The classify.seqs command parameters are reference, fasta, name, group, count, search, ksize, method, taxonomy, processors, match, mismatch, gapopen, gapextend, numwanted and probs.\n";
-		helpString += "The reference, fasta and taxonomy parameters are required.\n";
-		helpString += "The search parameter allows you to specify the method to find most similar template.  Your options are: suffix, kmer, blast, align and distance. The default is kmer.\n";
-		helpString += "The method parameter allows you to specify classification method to use.  Your options are: wang, knn and zap. The default is wang.\n";
-		helpString += "The ksize parameter allows you to specify the kmer size for finding most similar template to candidate.  The default is 8.\n";
-		helpString += "The processors parameter allows you to specify the number of processors to use. The default is 1.\n";
-		helpString += "The match parameter allows you to specify the bonus for having the same base. The default is 1.0.\n";
-		helpString += "The mistmatch parameter allows you to specify the penalty for having different bases.  The default is -1.0.\n";
-		helpString += "The gapopen parameter allows you to specify the penalty for opening a gap in an alignment. The default is -2.0.\n";
-		helpString += "The gapextend parameter allows you to specify the penalty for extending a gap in an alignment.  The default is -1.0.\n";
-		helpString += "The numwanted parameter allows you to specify the number of sequence matches you want with the knn method.  The default is 10.\n";
-		helpString += "The cutoff parameter allows you to specify a bootstrap confidence threshold for your taxonomy.  The default is 80.\n";
-		helpString += "The probs parameter shuts off the bootstrapping results for the wang and zap method. The default is true, meaning you want the bootstrapping to be shown.\n";
-		helpString += "The iters parameter allows you to specify how many iterations to do when calculating the bootstrap confidence score for your taxonomy with the wang method.  The default is 100.\n";
-		helpString += "The output parameter allows you to specify format of your summary file. Options are simple and detail. The default is detail.\n";
-    helpString += "The printlevel parameter allows you to specify taxlevel of your summary file to print to. Options are 1 to the max level in the file.  The default is -1, meaning max level.  If you select a level greater than the level your sequences classify to, mothur will print to the level your max level. \n";
-		helpString += "The classify.seqs command should be in the following format: \n";
-		helpString += "classify.seqs(reference=yourTemplateFile, fasta=yourFastaFile, method=yourClassificationMethod, search=yourSearchmethod, ksize=yourKmerSize, taxonomy=yourTaxonomyFile, processors=yourProcessors) \n";
-		helpString += "Example classify.seqs(fasta=amazon.fasta, reference=core.filtered, method=knn, search=gotoh, ksize=8, processors=2)\n";
-		helpString += "The .taxonomy file consists of 2 columns: 1 = your sequence name, 2 = the taxonomy for your sequence. \n";
-		helpString += "The .tax.summary is a summary of the different taxonomies represented in your fasta file. \n";
-		return helpString;
-	}
-	catch(exception& e) {
-		m->errorOut(e, "ClassifySeqsCommand", "getHelpString");
-		exit(1);
-	}
-}
-//**********************************************************************************************************************
-string ClassifySeqsCommand::getOutputPattern(string type) {
-    try {
-        string pattern = "";
-
-        if (type == "taxonomy") {  pattern = "[filename],[tag],[tag2],taxonomy"; }
-        else if (type == "accnos") {  pattern =  "[filename],[tag],[tag2],flip.accnos"; }
-        else if (type == "matchdist") {  pattern =  "[filename],[tag],[tag2],match.dist"; }
-        else { m->mothurOut("[ERROR]: No definition for type " + type + " output pattern.\n"); m->control_pressed = true;  }
-
-        return pattern;
-    }
-    catch(exception& e) {
-        m->errorOut(e, "ClassifySeqsCommand", "getOutputPattern");
-        exit(1);
-    }
-}
-//**********************************************************************************************************************
-ClassifySeqsCommand::ClassifySeqsCommand(){
-	try {
-		abort = true; calledHelp = true;
-		setParameters();
-	}
-	catch(exception& e) {
-		m->errorOut(e, "ClassifySeqsCommand", "ClassifySeqsCommand");
-		exit(1);
-	}
-}
-//**********************************************************************************************************************
-
-ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
+ClassifySeqsCommand::ClassifySeqsCommand(string fastaFileName_, string taxonomyFileName_, string referenceFileName_,
+		string outTax_, string outAccnos_, string outMatchdist_, string method_,
+		string search_, int kmerSize_, int cutoff_, int iters_, int numwanted_,
+		int processors_, int printlevel_, bool probs_, float match_, float misMatch_,
+		float gapOpen_, float gapExtend_, bool flip_) : ClassifySeqsCommand() {
 	abort = false; calledHelp = false;
 
-	vector<string> myArray = setParameters();
 
-	ValidParameters validParameter("classify.seqs");
-	map<string, string>::iterator it;
+	fastaFileName = fastaFileName_;
+	taxonomyFileName = taxonomyFileName_;
+	templateFileName = referenceFileName_;
+	outTax = outTax_;
+	outAccnos = outAccnos_;
+	outMatchdist = outMatchdist_;
+	method = method_;
+	search = search_;
+	kmerSize = kmerSize_;
+	cutoff = cutoff_;
+	iters = iters_;
+	numWanted = numwanted_;
+	processors = processors_;
+	printlevel = printlevel_;
+	probs = probs_;
+	match = match_;
+	misMatch = misMatch_;
+	gapOpen = gapOpen_;
+	gapExtend = gapExtend_;
+	flip = flip_;
 
-	//check to make sure all parameters are valid for command
-	for (it = parameters.begin(); it != parameters.end(); it++) {
-		if (validParameter.isValidParameter(it->first, myArray, it->second) != true) {  abort = true;  }
+	writeShortcuts = true;
+
+	m->setProcessors(std::to_string(processors));
+
+	if (taxonomyFileName == "") {
+			m->mothurOut("[ERROR]: The reference parameter is a required for the classify.seqs command.\n");
+			abort = true;
 	}
-
-	fastaFileName = validParameter.validFile(parameters, "fasta", false);
-
-	//check for optional parameter and set defaults
-	// ...at some point should added some additional type checking...
-	string temp;
-	temp = validParameter.validFile(parameters, "processors", false);	if (temp == "not found"){	temp = m->getProcessors();	}
-	m->setProcessors(temp);
-	m->mothurConvert(temp, processors);
-
-	//this has to go after save so that if the user sets save=t and provides no reference we abort
-	templateFileName = validParameter.validFile(parameters, "reference", true);
-	if (templateFileName == "not found") {
-			m->mothurOut("[ERROR]: The reference parameter is a required for the classify.seqs command.\n"); abort = true;
-	}else if (templateFileName == "not open") { abort = true; }
-
-
-	//this has to go after save so that if the user sets save=t and provides no reference we abort
-	taxonomyFileName = validParameter.validFile(parameters, "taxonomy", true);
-	if (taxonomyFileName == "not found") {  m->mothurOut("[ERROR]: The taxonomy parameter is a required for the classify.seqs command.\n"); abort = true;
-	}else if (taxonomyFileName == "not open") { abort = true; }
-
-	search = validParameter.validFile(parameters, "search", false);		if (search == "not found"){	search = "kmer";		}
-
-	method = validParameter.validFile(parameters, "method", false);		if (method == "not found"){	method = "wang";	}
-
-				temp = validParameter.validFile(parameters, "ksize", false);		if (temp == "not found"){
-						temp = "8";
-						if (method == "zap") { temp = "7"; }
-				}
-	m->mothurConvert(temp, kmerSize);
-
-	temp = validParameter.validFile(parameters, "match", false);		if (temp == "not found"){	temp = "1.0";			}
-	m->mothurConvert(temp, match);
-
-				temp = validParameter.validFile(parameters, "printlevel", false);		if (temp == "not found"){	temp = "-1";		}
-				m->mothurConvert(temp, printlevel);
-
-	temp = validParameter.validFile(parameters, "mismatch", false);		if (temp == "not found"){	temp = "-1.0";			}
-	m->mothurConvert(temp, misMatch);
-
-	temp = validParameter.validFile(parameters, "gapopen", false);		if (temp == "not found"){	temp = "-2.0";			}
-	m->mothurConvert(temp, gapOpen);
-
-	temp = validParameter.validFile(parameters, "gapextend", false);	if (temp == "not found"){	temp = "-1.0";			}
-	m->mothurConvert(temp, gapExtend);
-
-	temp = validParameter.validFile(parameters, "numwanted", false);	if (temp == "not found"){	temp = "10";			}
-	m->mothurConvert(temp, numWanted);
-
-	temp = validParameter.validFile(parameters, "cutoff", false);		if (temp == "not found"){	temp = "80";				}
-	m->mothurConvert(temp, cutoff);
-
-	temp = validParameter.validFile(parameters, "probs", false);		if (temp == "not found"){	temp = "true";			}
-	probs = m->isTrue(temp);
-
-	temp = validParameter.validFile(parameters, "shortcuts", false);	if (temp == "not found"){	temp = "true";			}
-	writeShortcuts = m->isTrue(temp);
-
-	temp = validParameter.validFile(parameters, "outtax", false);	if (temp == "not found"){
-			m->mothurOut("[ERROR]: The reference parameter is a required for the classify.seqs command.\n"); abort = true;}
-	outTax = temp;
-	temp = validParameter.validFile(parameters, "outaccnos", false);	if (temp == "not found"){	temp = "";			}
-	outAccnos = temp;
-	temp = validParameter.validFile(parameters, "outmatchdist", false);	if (temp == "not found"){	temp = "";			}
-	outMatchdist = temp;
-
-	//temp = validParameter.validFile(parameters, "flip", false);			if (temp == "not found"){	temp = "T";				}
-	//flip = m->isTrue(temp);
-	flip = true;
-
-	temp = validParameter.validFile(parameters, "iters", false);		if (temp == "not found") { temp = "100";			}
-	m->mothurConvert(temp, iters);
 
 	if ((method == "wang") && (search != "kmer"))  {
 		m->mothurOut("The wang method requires the kmer search. " + search + " will be disregarded, and kmer will be used." ); m->mothurOutEndLine();
 		search = "kmer";
 	}
 
-				if ((method == "zap") && ((search != "kmer") && (search != "align")))  {
+	if ((method == "zap") && ((search != "kmer") && (search != "align")))  {
 		m->mothurOut("The zap method requires the kmer or align search. " + search + " will be disregarded, and kmer will be used." ); m->mothurOutEndLine();
 		search = "kmer";
 	}
 
+}
+
+ClassifySeqsCommand::ClassifySeqsCommand(){
+	m = MothurOut::getInstance();
+       try {
+               abort = true; calledHelp = true;
+       }
+       catch(exception& e) {
+               m->errorOut(e, "ClassifySeqsCommand", "ClassifySeqsCommand");
+               exit(1);
+       }
 }
 
 //**********************************************************************************************************************

@@ -27,33 +27,7 @@ int main(int argc, char *argv[]){
 	m->setReleaseDate(releaseDate);
 	m->setVersion(mothurVersion);
 
-	// // Parse arguments (expect '--') into a map<string, string>
-	// map<string, string> parameters;
-	// try {
-	// 	parameters = jwutil::argvToMap(argc, argv);
-	// } catch (string message) {
-	// 	m->mothurOut(message);
-	// 	m->mothurOutEndLine();
-	// 	m->mothurOut("Use \"maturnal --help\" to see a list of options.");
-	// 	m->mothurOutEndLine();
-	// 	return 1;
-	// }
-	//
-	// // See if user has requested help, citation, or execution
-	// if (parameters.count("help") > 0) {
-	// 	// Print help
-	// 	m->mothurOut(ClassifySeqsCommand().getHelpString());
-	// 	m->mothurOutEndLine();
-	// } else if (parameters.count("citation") > 0) {
-	// 	// Print citation
-	// 	m->mothurOut(ClassifySeqsCommand().getCitation());
-	// 	m->mothurOutEndLine();
-	// } else {
-	// 	// Classify the sequences
-	// 	ClassifySeqsCommand command = ClassifySeqsCommand(parameters);
-	// 	command.execute();
-	// }
-
+	// Set up the argument parser
 	args::ArgumentParser parser("This is a test program.", "This goes after the options.");
   parser.LongSeparator(" ");
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
@@ -95,6 +69,9 @@ int main(int argc, char *argv[]){
 		{"numwanted"}, 10);
 	args::ValueFlag<int> processorsF(classifyOptionsGroup, "PROCESSORS",
 		"Number of processors. Default: 1", {"processors"}, 1);
+	args::Flag noFlipF(classifyOptionsGroup, "",
+		"If specified, don't try reverse complement of sequences.",
+		{"no_flip"});
 
 	args::Group outFormatGroup(parser, "Output format:");
 	args::ValueFlag<int> printlevelF(outFormatGroup, "PRINTLEVEL",
@@ -114,6 +91,7 @@ int main(int argc, char *argv[]){
 	args::ValueFlag<float> gapextendF(alignGroup, "GAPEXTEND",
 		"Gap extend score. Default: -1.0", {"gapextend"}, -1.0);
 
+	// Parse the arguments, printing to STDERR if there are any exceptions
 	try {
 	    parser.ParseCLI(argc, argv);
 	} catch (args::Help) {
@@ -131,6 +109,7 @@ int main(int argc, char *argv[]){
 	    return 1;
 	}
 
+	// Store the arguments
 	string fasta = args::get(fastaF);
 	string taxonomy = args::get(taxonomyF);
 	string reference = args::get(referenceF);
@@ -145,39 +124,22 @@ int main(int argc, char *argv[]){
 	int numwanted = args::get(numwantedF);
 	int processors = args::get(processorsF);
 	int printlevel = args::get(printlevelF);
-	bool noProbs = args::get(noProbsF);
+	bool probs = !args::get(noProbsF);
 	float match = args::get(matchF);
 	float mismatch = args::get(mismatchF);
 	float gapopen = args::get(gapopenF);
 	float gapextend = args::get(gapextendF);
+	bool flip = !args::get(noFlipF);
 
+	// TODO: Validate arguments
 
-
-	cout << "fasta\t" << fasta << endl;
-	cout << "taxonomy\t" << taxonomy << endl;
-	cout << "reference\t" << reference << endl;
-	cout << "output\t" << output << endl;
-	cout << "outputFlipped\t" << outputFlipped << endl;
-	cout << "outputMatchdist\t" << outputMatchdist << endl;
-	cout << "method\t" << method << endl;
-	cout << "search\t" << search << endl;
-	cout << "ksize\t" << ksize << endl;
-	cout << "cutoff\t" << cutoff << endl;
-	cout << "iters\t" << iters << endl;
-	cout << "numwanted\t" << numwanted << endl;
-	cout << "processors\t" << processors << endl;
-	cout << "printlevel\t" << printlevel << endl;
-	cout << "noProbs\t" << noProbs << endl;
-	cout << "match\t" << match << endl;
-	cout << "mismatch\t" << mismatch << endl;
-	cout << "gapopen\t" << gapopen << endl;
-	cout << "gapextend\t" << gapextend << endl;
-
-	// if (integer) { std::cout << "i: " << args::get(integer) << std::endl; }
-	// if (characters) { for (const auto ch: args::get(characters)) { std::cout << "c: " << ch << std::endl; } }
-	// if (foo) { std::cout << "f: " << args::get(foo) << std::endl; }
-	// if (numbers) { for (const auto nm: args::get(numbers)) { std::cout << "n: " << nm << std::endl; } }
-	// return 0;
+	// Run the classifier
+	ClassifySeqsCommand command = ClassifySeqsCommand(fasta, taxonomy, reference,
+		output, outputFlipped, outputMatchdist, method,
+		search, ksize, cutoff, iters, numwanted,
+		processors, printlevel, probs, match, mismatch,
+		gapopen, gapextend, flip);
+	command.execute();
 
 	return 0;
 }

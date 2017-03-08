@@ -32,22 +32,31 @@
 
 
 
-class ClassifySeqsCommand : public Command {
+class ClassifySeqsCommand {
 
 public:
 	ClassifySeqsCommand(map<string, string>);
+	ClassifySeqsCommand(string fasta, string taxonomy, string reference,
+		string output, string outputFlipped, string outputMatchdist, string method,
+		string search, int ksize, int cutoff, int iters, int numwanted,
+		int processors, int printlevel, bool noProbs, float match, float mismatch,
+		float gapopen, float gapextend, bool flip);
 	ClassifySeqsCommand();
 	~ClassifySeqsCommand();
 
-	vector<string> setParameters();
 
-	string getHelpString();
-  string getOutputPattern(string);
 	string getCitation() { return "Wang Q, Garrity GM, Tiedje JM, Cole JR (2007). Naive Bayesian classifier for rapid assignment of rRNA sequences into the new bacterial taxonomy. Appl Environ Microbiol 73: 5261-7. [ for Bayesian classifier ] \nAltschul SF, Madden TL, Schaffer AA, Zhang J, Zhang Z, Miller W, Lipman DJ (1997). Gapped BLAST and PSI-BLAST: a new generation of protein database search programs. Nucleic Acids Res 25: 3389-402. [ for BLAST ] \nDeSantis TZ, Hugenholtz P, Larsen N, Rojas M, Brodie EL, Keller K, Huber T, Dalevi D, Hu P, Andersen GL (2006). Greengenes, a chimera-checked 16S rRNA gene database and workbench compatible with ARB. Appl Environ Microbiol 72: 5069-72. [ for kmer ] \nhttp://www.mothur.org/wiki/Classify.seqs"; }
 
 	int execute();
 
+protected:
+	MothurOut* m;
+	bool calledHelp;
 
+	map<string, vector<string> > outputTypes;
+	vector<CommandParameter> parameters;
+
+	map<string, vector<string> >::iterator itTypes;
 
 private:
 
