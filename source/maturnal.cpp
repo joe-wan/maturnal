@@ -27,15 +27,18 @@ int main(int argc, char *argv[]){
 	m->setVersion(mothurVersion);
 
 	// Parse arguments (expect '--') into a map<string, string>
+	map<string, string> parameters;
 	try {
-		map<string, string> parameters = jwutil::argvToMap(argc, argv);
-		ClassifySeqsCommand command = ClassifySeqsCommand(parameters);
-		command.execute();
+		parameters = jwutil::argvToMap(argc, argv);
 	} catch (string message) {
 		m->mothurOut(message);
 		m->mothurOutEndLine();
 		return 1;
 	}
+
+	// Classify the sequences
+	ClassifySeqsCommand command = ClassifySeqsCommand(parameters);
+	command.execute();
 
 	return 0;
 }
