@@ -11,7 +11,6 @@
  */
 
 
-#include "command.hpp"
 #include "classify.h"
 #include "sequence.hpp"
 #include "bayesian.h"
@@ -54,7 +53,6 @@ protected:
 	bool calledHelp;
 
 	map<string, vector<string> > outputTypes;
-	vector<CommandParameter> parameters;
 
 	map<string, vector<string> >::iterator itTypes;
 
