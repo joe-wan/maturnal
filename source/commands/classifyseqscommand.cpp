@@ -33,6 +33,9 @@ vector<string> ClassifySeqsCommand::setParameters(){
 		CommandParameter piters("iters", "Number", "", "100", "", "", "","",false,true); parameters.push_back(piters);
 		CommandParameter pnumwanted("numwanted", "Number", "", "10", "", "", "","",false,true); parameters.push_back(pnumwanted);
 		CommandParameter pseed("seed", "Number", "", "0", "", "", "","",false,false); parameters.push_back(pseed);
+		CommandParameter outtax("outtax", "String", "", "", "", "", "","",false,true,true); parameters.push_back(outtax);
+		CommandParameter outaccnos("outaccnos", "String", "", "", "", "", "","",false,false); parameters.push_back(outaccnos);
+		CommandParameter outmatchdist("outmatchdist", "String", "", "", "", "", "","",false,false); parameters.push_back(outmatchdist);
 		vector<string> myArray;
 		for (int i = 0; i < parameters.size(); i++) {	myArray.push_back(parameters[i].name);		}
 		return myArray;
@@ -62,7 +65,7 @@ string ClassifySeqsCommand::getHelpString(){
 		helpString += "The probs parameter shuts off the bootstrapping results for the wang and zap method. The default is true, meaning you want the bootstrapping to be shown.\n";
 		helpString += "The iters parameter allows you to specify how many iterations to do when calculating the bootstrap confidence score for your taxonomy with the wang method.  The default is 100.\n";
 		helpString += "The output parameter allows you to specify format of your summary file. Options are simple and detail. The default is detail.\n";
-    helpString += "The printlevel parameter allows you to specify taxlevel of your summary file to print to. Options are 1 to the maz level in the file.  The default is -1, meaning max level.  If you select a level greater than the level your sequences classify to, mothur will print to the level your max level. \n";
+    helpString += "The printlevel parameter allows you to specify taxlevel of your summary file to print to. Options are 1 to the max level in the file.  The default is -1, meaning max level.  If you select a level greater than the level your sequences classify to, mothur will print to the level your max level. \n";
 		helpString += "The classify.seqs command should be in the following format: \n";
 		helpString += "classify.seqs(reference=yourTemplateFile, fasta=yourFastaFile, method=yourClassificationMethod, search=yourSearchmethod, ksize=yourKmerSize, taxonomy=yourTaxonomyFile, processors=yourProcessors) \n";
 		helpString += "Example classify.seqs(fasta=amazon.fasta, reference=core.filtered, method=knn, search=gotoh, ksize=8, processors=2)\n";
@@ -97,10 +100,6 @@ ClassifySeqsCommand::ClassifySeqsCommand(){
 	try {
 		abort = true; calledHelp = true;
 		setParameters();
-		vector<string> tempOutNames;
-		outputTypes["taxonomy"] = tempOutNames;
-		outputTypes["accnos"] = tempOutNames;
-		outputTypes["matchdist"] = tempOutNames;
 	}
 	catch(exception& e) {
 		m->errorOut(e, "ClassifySeqsCommand", "ClassifySeqsCommand");
@@ -121,12 +120,6 @@ ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
 	for (it = parameters.begin(); it != parameters.end(); it++) {
 		if (validParameter.isValidParameter(it->first, myArray, it->second) != true) {  abort = true;  }
 	}
-
-	//initialize outputTypes
-	vector<string> tempOutNames;
-	outputTypes["taxonomy"] = tempOutNames;
-	outputTypes["matchdist"] = tempOutNames;
-	outputTypes["accnos"] = tempOutNames;
 
 	fastaFileName = validParameter.validFile(parameters, "fasta", false);
 
@@ -183,8 +176,16 @@ ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
 	temp = validParameter.validFile(parameters, "probs", false);		if (temp == "not found"){	temp = "true";			}
 	probs = m->isTrue(temp);
 
-				temp = validParameter.validFile(parameters, "shortcuts", false);	if (temp == "not found"){	temp = "true";			}
+	temp = validParameter.validFile(parameters, "shortcuts", false);	if (temp == "not found"){	temp = "true";			}
 	writeShortcuts = m->isTrue(temp);
+
+	temp = validParameter.validFile(parameters, "outtax", false);	if (temp == "not found"){
+			m->mothurOut("[ERROR]: The reference parameter is a required for the classify.seqs command.\n"); abort = true;}
+	outTax = temp;
+	temp = validParameter.validFile(parameters, "outaccnos", false);	if (temp == "not found"){	temp = "";			}
+	outAccnos = temp;
+	temp = validParameter.validFile(parameters, "outmatchdist", false);	if (temp == "not found"){	temp = "";			}
+	outMatchdist = temp;
 
 	//temp = validParameter.validFile(parameters, "flip", false);			if (temp == "not found"){	temp = "T";				}
 	//flip = m->isTrue(temp);
@@ -253,13 +254,15 @@ int ClassifySeqsCommand::execute(){
     variables["[tag]"] = RippedTaxName;
     variables["[tag2]"] = outputMethodTag;
 
-		string newTaxonomyFile = getOutputFileName("taxonomy", variables);
-		string newaccnosFile = getOutputFileName("accnos", variables);
-		string tempTaxonomyFile = m->hasPath(fastaFileName) + m->getRootName(m->getSimpleName(fastaFileName)) + "taxonomy.temp";
+		string tempTaxonomyFile = outTax + ".temp";
+		keepAccnos = true;
+		if (outAccnos.size() == 0) {
+			keepAccnos = false;
+			outAccnos = outTax + ".accnos.temp";
+		}
 
 		if ((method == "knn") && (search == "distance")) {
-			string DistName = getOutputFileName("matchdist", variables);
-			classify->setDistName(DistName);
+			classify->setDistName(outMatchdist);
 		}
 
 		int start = time(NULL);
@@ -292,21 +295,26 @@ int ClassifySeqsCommand::execute(){
 		#endif
 
 		if (processors == 1) {
-			numFastaSeqs = driver(lines[0], newTaxonomyFile, tempTaxonomyFile, newaccnosFile, fastaFileName);
+			numFastaSeqs = driver(lines[0], outTax, tempTaxonomyFile, outAccnos, fastaFileName);
 		} else {
-			numFastaSeqs = createProcesses(newTaxonomyFile, tempTaxonomyFile, newaccnosFile, fastaFileName);
+			numFastaSeqs = createProcesses(outTax, tempTaxonomyFile, outAccnos, fastaFileName);
 		}
 
 		// Check if any sequences were reversed.
-		if (!m->isBlank(newaccnosFile)) {
+		if (!m->isBlank(outAccnos)) {
 			m->mothurOutEndLine();
 			m->mothurOut(string("[WARNING]: mothur reversed some your sequences ") +
-			  "for a better classification.  If you would like to take a closer " +
-				"look, please check " + newaccnosFile + " for the list of the " +
+				"for a better classification.");
+			if (keepAccnos) {
+				m->mothurOut(string(" If you would like to take a closer ") +
+				"look, please check " + outAccnos + " for the list of the " +
 				"sequences.");
+			}
 			m->mothurOutEndLine();
-    } else {
-			m->mothurRemove(newaccnosFile);
+    }
+
+		if (!keepAccnos) {
+			m->mothurRemove(outAccnos);
 		}
 
 		// Report time for classification
@@ -320,11 +328,11 @@ int ClassifySeqsCommand::execute(){
 
     //output taxonomy with the unclassified bins added
     ifstream inTax;
-    m->openInputFile(newTaxonomyFile, inTax);
+    m->openInputFile(outTax, inTax);
 
-    ofstream outTax;
-    string unclass = newTaxonomyFile + ".unclass.temp";
-    m->openOutputFile(unclass, outTax);
+    ofstream outTax_handle;
+    string unclass = outTax + ".unclass.temp";
+    m->openOutputFile(unclass, outTax_handle);
 
     //get maxLevel from phylotree so you know how many 'unclassified's to add
     int maxLevel = classify->getMaxLevel();
@@ -342,14 +350,14 @@ int ClassifySeqsCommand::execute(){
 
         string newTax = m->addUnclassifieds(taxon, maxLevel, probs);
 
-        outTax << name << '\t' << newTax << endl;
+        outTax_handle << name << '\t' << newTax << endl;
     }
 
     inTax.close();
-    outTax.close();
+    outTax_handle.close();
 
-    m->mothurRemove(newTaxonomyFile);
-    m->renameFile(unclass, newTaxonomyFile);
+    m->mothurRemove(outTax);
+    m->renameFile(unclass, outTax);
 
     if (ct != NULL) { delete ct; }
     if (groupMap != NULL) { delete groupMap; } delete taxaSum;
@@ -546,8 +554,8 @@ int ClassifySeqsCommand::createProcesses(string taxFileName, string tempTaxFile,
 
 int ClassifySeqsCommand::driver(linePair* filePos, string taxFName, string tempTFName, string accnos, string filename){
 	try {
-		ofstream outTax;
-		m->openOutputFile(taxFName, outTax);
+		ofstream outTax_handle;
+		m->openOutputFile(taxFName, outTax_handle);
 
 		ofstream outTaxSimple;
 		m->openOutputFile(tempTFName, outTaxSimple);
@@ -568,7 +576,7 @@ int ClassifySeqsCommand::driver(linePair* filePos, string taxFName, string tempT
 		while (!done) {
 			if (m->control_pressed) {
 				inFASTA.close();
-				outTax.close();
+				outTax_handle.close();
 				outTaxSimple.close();
 				outAcc.close(); return 0; }
 
@@ -584,9 +592,9 @@ int ClassifySeqsCommand::driver(linePair* filePos, string taxFName, string tempT
 
 				//output confidence scores or not
 				if (probs) {
-					outTax << candidateSeq->getName() << '\t' << taxonomy << endl;
+					outTax_handle << candidateSeq->getName() << '\t' << taxonomy << endl;
 				}else{
-					outTax << candidateSeq->getName() << '\t' << classify->getSimpleTax() << endl;
+					outTax_handle << candidateSeq->getName() << '\t' << classify->getSimpleTax() << endl;
 				}
 
 				if (classify->getFlipped()) { outAcc << candidateSeq->getName() << endl; }
@@ -612,7 +620,7 @@ int ClassifySeqsCommand::driver(linePair* filePos, string taxFName, string tempT
 		if((count) % 100 != 0){	m->mothurOutJustToScreen("Processing sequence: " + toString(count)+"\n"); 		}
 
 		inFASTA.close();
-		outTax.close();
+		outTax_handle.close();
 		outTaxSimple.close();
 		outAcc.close();
 
