@@ -6,12 +6,11 @@
 #include "sabundvector.hpp"
 #include "sharedsabundvector.h"
 #include "rabundvector.hpp"
-#include "uvest.h"
 #include "mothurout.h"
 
 /* The calculator class is the parent class for all the different estimators implemented in mothur except the tree calculators.
-It has 2 pure functions EstOutput getValues(SAbundVector*), which works on a single group, and 
-EstOutput getValues(SharedRAbundVector* shared1, SharedRAbundVector* shared2), which compares 2 groups. */ 
+It has 2 pure functions EstOutput getValues(SAbundVector*), which works on a single group, and
+EstOutput getValues(SharedRAbundVector* shared1, SharedRAbundVector* shared2), which compares 2 groups. */
 
 
 typedef vector<double> EstOutput;
@@ -25,7 +24,7 @@ public:
 	virtual ~Calculator(){};
 	Calculator(string n, int c, bool f) : name(n), cols(c), multiple(f) { m = MothurOut::getInstance(); needsAll = false; };
 	Calculator(string n, int c, bool f, bool a) : name(n), cols(c), multiple(f), needsAll(a) { m = MothurOut::getInstance(); };
-	virtual EstOutput getValues(SAbundVector*) = 0;	
+	virtual EstOutput getValues(SAbundVector*) = 0;
 	virtual EstOutput getValues(vector<SharedRAbundVector*>) = 0;
     //optional calc that returns the otus labels of shared otus
     virtual EstOutput getValues(vector<SharedRAbundVector*> sv , vector<string>&) { data = getValues(sv); return data; }
@@ -65,7 +64,7 @@ class VecCalc
 		int sumElements(vector<int>, int);
 		int sumElements(vector<int>);
 		double sumElements(vector<double>); //This returns the sum of all the values in the vector.
-		double sumElements(vector<double>, int); //This returns the sum of all the values in the vector excluding those whose index is before the given index.  
+		double sumElements(vector<double>, int); //This returns the sum of all the values in the vector excluding those whose index is before the given index.
 		//double findMax(vector<double>); //This returns the maximum value in the vector.
 		int numNZ(vector<int>); //This returns the number of non-zero values in the vector.
 		double numNZ(vector<double>); //This returns the number of non-zero values in the vector.
@@ -80,4 +79,3 @@ class TDTable
 };
 /**************************************************************************************************/
 #endif
-

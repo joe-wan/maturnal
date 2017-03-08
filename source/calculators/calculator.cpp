@@ -15,12 +15,12 @@ int VecCalc::sumElements(vector<int> vec){
 }
 /***********************************************************************/
 int VecCalc::sumElements(vector<int> vec, int index){
-	
+
 		int sum = 0;
 		for(int i = index; i < vec.size(); i++)
 			sum += vec.at(i);
 		return sum;
-	
+
 }
 
 /***********************************************************************/
@@ -29,30 +29,30 @@ double VecCalc::sumElements(vector<double> vec){
 		for(int i = 0; i < vec.size(); i++)
 			sum += vec.at(i);
 		return sum;
-	
+
 }
 /***********************************************************************/
 double VecCalc::sumElements(vector<double> vec, int index){
-	
+
 		double sum = 0;
 		for(int i = index; i < vec.size(); i++)
 			sum += vec.at(i);
 		return sum;
-	
+
 }
 /***********************************************************************/
 int VecCalc::numNZ(vector<int> vec){
-	
+
 		int numNZ = 0;
 		for(int i = 0; i < vec.size(); i++)
 			if(vec.at(i) != 0)
 				numNZ++;
 		return numNZ;
-	
+
 }
 /***********************************************************************/
 double VecCalc::numNZ(vector<double> vec){
-	
+
 		double numNZ = 0;
 		for(int i = 0; i < vec.size(); i++)
 			if(vec.at(i) != 0)
@@ -61,7 +61,7 @@ double VecCalc::numNZ(vector<double> vec){
 	}
 /***********************************************************************/
 double TDTable::getConfLimit(int row, int col) //Rows are the degrees of freedom
-{                         
+{
 		//Found on http://www.vgtu.lt/leidiniai/elektroniniai/Probability.pdf/Table%203.pdf
 
 		//Confidence Level        .90    .95     .975     .99    .995     .999    .9995
@@ -95,12 +95,9 @@ double TDTable::getConfLimit(int row, int col) //Rows are the degrees of freedom
 								{1.313,	1.701,	2.048,	2.467,	2.763,	3.408,	3.674},
 								{1.311,	1.699,	2.045,	2.462,	2.756,	3.396,	3.660},
 								{1.310,	1.697,	2.042,	2.457,	2.750,	3.385,	3.646}};
-								
+
 		return values[row][col];
-	
+
 }
 
 /***********************************************************************/
-
-
-

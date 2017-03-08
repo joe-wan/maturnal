@@ -11,7 +11,7 @@
 64BIT_VERSION ?= yes
 OPTIMIZE ?= yes
 USEREADLINE ?= yes
-USEBOOST ?= yes
+USEBOOST ?= no
 BOOST_LIBRARY_DIR="\"Enter_your_boost_library_path_here\""
 BOOST_INCLUDE_DIR="\"Enter_your_boost_include_path_here\""
 MOTHUR_FILES="\"Enter_your_default_path_here\""
@@ -58,9 +58,9 @@ endif
 # INCLUDE directories for mothur
 #
 #
-    VPATH=source/calculators:source/chimera:source/classifier:source/clearcut:source/commands:source/communitytype:source/datastructures:source/metastats:source/randomforest:source/read:source/svm
+    VPATH=source/calculators:source/classifier:source/commands:source/datastructures
     skipUchime := source/uchime_src/
-    subdirs :=  $(sort $(dir $(filter-out  $(skipUchime), $(wildcard source/*/))))
+    subdirs :=  $(sort $(dir $(wildcard source/*/)))
     subDirIncludes = $(patsubst %, -I %, $(subdirs))
     subDirLinking =  $(patsubst %, -L%, $(subdirs))
     CXXFLAGS += -I. $(subDirIncludes)
@@ -75,11 +75,8 @@ endif
     OBJECTS+=$(patsubst %.cpp,%.o,$(wildcard *.cpp))
     OBJECTS+=$(patsubst %.c,%.o,$(wildcard *.c))
 
-mothur : $(OBJECTS) uchime
+mothur : $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(TARGET_ARCH) -o $@ $(OBJECTS) $(LIBS)
-
-uchime:
-	cd source/uchime_src && ./mk && mv uchime ../../ && cd ..
 
 install : mothur
 
@@ -95,4 +92,3 @@ install : mothur
 
 clean :
 	@rm -f $(OBJECTS)
-	@rm -f uchime
