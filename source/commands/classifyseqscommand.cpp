@@ -31,12 +31,8 @@ vector<string> ClassifySeqsCommand::setParameters(){
 		CommandParameter pcutoff("cutoff", "Number", "", "80", "", "", "","",false,true); parameters.push_back(pcutoff);
 		CommandParameter pprobs("probs", "Boolean", "", "T", "", "", "","",false,false); parameters.push_back(pprobs);
 		CommandParameter piters("iters", "Number", "", "100", "", "", "","",false,true); parameters.push_back(piters);
-		CommandParameter pshortcuts("shortcuts", "Boolean", "", "T", "", "", "","",false,false); parameters.push_back(pshortcuts);
-		CommandParameter prelabund("relabund", "Boolean", "", "F", "", "", "","",false,false); parameters.push_back(prelabund);
 		CommandParameter pnumwanted("numwanted", "Number", "", "10", "", "", "","",false,true); parameters.push_back(pnumwanted);
 		CommandParameter pseed("seed", "Number", "", "0", "", "", "","",false,false); parameters.push_back(pseed);
-		CommandParameter pinputdir("inputdir", "String", "", "", "", "", "","",false,false); parameters.push_back(pinputdir);
-
 		vector<string> myArray;
 		for (int i = 0; i < parameters.size(); i++) {	myArray.push_back(parameters[i].name);		}
 		return myArray;
@@ -51,8 +47,8 @@ string ClassifySeqsCommand::getHelpString(){
 	try {
 		string helpString = "";
 		helpString += "The classify.seqs command reads a fasta file containing sequences and creates a .taxonomy file and a .tax.summary file.\n";
-		helpString += "The classify.seqs command parameters are reference, fasta, name, group, count, search, ksize, method, taxonomy, processors, match, mismatch, gapopen, gapextend, numwanted, relabund and probs.\n";
-		helpString += "The reference, fasta and taxonomy parameters are required. You may enter multiple fasta files by separating their names with dashes. ie. fasta=abrecovery.fasta-amzon.fasta \n";
+		helpString += "The classify.seqs command parameters are reference, fasta, name, group, count, search, ksize, method, taxonomy, processors, match, mismatch, gapopen, gapextend, numwanted and probs.\n";
+		helpString += "The reference, fasta and taxonomy parameters are required.\n";
 		helpString += "The search parameter allows you to specify the method to find most similar template.  Your options are: suffix, kmer, blast, align and distance. The default is kmer.\n";
 		helpString += "The method parameter allows you to specify classification method to use.  Your options are: wang, knn and zap. The default is wang.\n";
 		helpString += "The ksize parameter allows you to specify the kmer size for finding most similar template to candidate.  The default is 8.\n";
@@ -64,7 +60,6 @@ string ClassifySeqsCommand::getHelpString(){
 		helpString += "The numwanted parameter allows you to specify the number of sequence matches you want with the knn method.  The default is 10.\n";
 		helpString += "The cutoff parameter allows you to specify a bootstrap confidence threshold for your taxonomy.  The default is 80.\n";
 		helpString += "The probs parameter shuts off the bootstrapping results for the wang and zap method. The default is true, meaning you want the bootstrapping to be shown.\n";
-    helpString += "The relabund parameter allows you to indicate you want the summary file values to be relative abundances rather than raw abundances. Default=F. \n";
 		helpString += "The iters parameter allows you to specify how many iterations to do when calculating the bootstrap confidence score for your taxonomy with the wang method.  The default is 100.\n";
 		helpString += "The output parameter allows you to specify format of your summary file. Options are simple and detail. The default is detail.\n";
     helpString += "The printlevel parameter allows you to specify taxlevel of your summary file to print to. Options are 1 to the maz level in the file.  The default is -1, meaning max level.  If you select a level greater than the level your sequences classify to, mothur will print to the level your max level. \n";
@@ -86,7 +81,6 @@ string ClassifySeqsCommand::getOutputPattern(string type) {
         string pattern = "";
 
         if (type == "taxonomy") {  pattern = "[filename],[tag],[tag2],taxonomy"; }
-        else if (type == "taxsummary") {  pattern = "[filename],[tag],[tag2],tax.summary"; }
         else if (type == "accnos") {  pattern =  "[filename],[tag],[tag2],flip.accnos"; }
         else if (type == "matchdist") {  pattern =  "[filename],[tag],[tag2],match.dist"; }
         else { m->mothurOut("[ERROR]: No definition for type " + type + " output pattern.\n"); m->control_pressed = true;  }
@@ -106,7 +100,6 @@ ClassifySeqsCommand::ClassifySeqsCommand(){
 		vector<string> tempOutNames;
 		outputTypes["taxonomy"] = tempOutNames;
 		outputTypes["accnos"] = tempOutNames;
-		outputTypes["taxsummary"] = tempOutNames;
 		outputTypes["matchdist"] = tempOutNames;
 	}
 	catch(exception& e) {
@@ -132,31 +125,8 @@ ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
 	//initialize outputTypes
 	vector<string> tempOutNames;
 	outputTypes["taxonomy"] = tempOutNames;
-	outputTypes["taxsummary"] = tempOutNames;
 	outputTypes["matchdist"] = tempOutNames;
 	outputTypes["accnos"] = tempOutNames;
-
-	//if the user changes the input directory command factory will send this info to us in the output parameter
-	string inputDir = validParameter.validFile(parameters, "inputdir", false);
-	if (inputDir == "not found"){	inputDir = "";		}
-	else {
-		string path;
-		it = parameters.find("reference");
-		//user has given a template file
-		if(it != parameters.end()){
-			path = m->hasPath(it->second);
-			//if the user has not given a path then, add inputdir. else leave path alone.
-			if (path == "") {	parameters["reference"] = inputDir + it->second;		}
-		}
-
-		it = parameters.find("taxonomy");
-		//user has given a template file
-		if(it != parameters.end()){
-			path = m->hasPath(it->second);
-			//if the user has not given a path then, add inputdir. else leave path alone.
-			if (path == "") {	parameters["taxonomy"] = inputDir + it->second;		}
-		}
-				}
 
 	fastaFileName = validParameter.validFile(parameters, "fasta", false);
 
@@ -212,9 +182,6 @@ ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
 
 	temp = validParameter.validFile(parameters, "probs", false);		if (temp == "not found"){	temp = "true";			}
 	probs = m->isTrue(temp);
-
-				temp = validParameter.validFile(parameters, "relabund", false);		if (temp == "not found"){	temp = "false";			}
-	relabund = m->isTrue(temp);
 
 				temp = validParameter.validFile(parameters, "shortcuts", false);	if (temp == "not found"){	temp = "true";			}
 	writeShortcuts = m->isTrue(temp);
@@ -289,17 +256,11 @@ int ClassifySeqsCommand::execute(){
 		string newTaxonomyFile = getOutputFileName("taxonomy", variables);
 		string newaccnosFile = getOutputFileName("accnos", variables);
 		string tempTaxonomyFile = m->hasPath(fastaFileName) + m->getRootName(m->getSimpleName(fastaFileName)) + "taxonomy.temp";
-		string taxSummary = getOutputFileName("taxsummary", variables);
 
 		if ((method == "knn") && (search == "distance")) {
 			string DistName = getOutputFileName("matchdist", variables);
-			classify->setDistName(DistName);  outputNames.push_back(DistName); outputTypes["matchdist"].push_back(DistName);
+			classify->setDistName(DistName);
 		}
-
-		outputNames.push_back(newTaxonomyFile);
-		outputTypes["taxonomy"].push_back(newTaxonomyFile);
-		outputNames.push_back(taxSummary);
-		outputTypes["taxsummary"].push_back(taxSummary);
 
 		int start = time(NULL);
 		int numFastaSeqs = 0;
@@ -307,6 +268,7 @@ int ClassifySeqsCommand::execute(){
 
 		vector<unsigned long long> positions;
 
+		// Split job into parallel tasks
 		#if defined (__APPLE__) || (__MACH__) || (linux) || (__linux) || (__linux__) || (__unix__) || (__unix)
 			positions = m->divideFile(fastaFileName, processors);
 			for (int i = 0; i < (positions.size()-1); i++) {
@@ -343,8 +305,6 @@ int ClassifySeqsCommand::execute(){
 				"look, please check " + newaccnosFile + " for the list of the " +
 				"sequences.");
 			m->mothurOutEndLine();
-      outputNames.push_back(newaccnosFile);
-			outputTypes["accnos"].push_back(newaccnosFile);
     } else {
 			m->mothurRemove(newaccnosFile);
 		}
@@ -376,65 +336,29 @@ int ClassifySeqsCommand::execute(){
     CountTable* ct = NULL;
     PhyloSummary* taxaSum;
 
+    while (!inTax.eof()) {
+        inTax >> name; m->gobble(inTax);
+        taxon = m->getline(inTax); m->gobble(inTax);
 
-                taxaSum = new PhyloSummary(groupMap, relabund, printlevel);
+        string newTax = m->addUnclassifieds(taxon, maxLevel, probs);
 
-            while (!inTax.eof()) {
-                if (m->control_pressed) { outputTypes.clear(); if (ct != NULL) { delete ct; }  if (groupMap != NULL) { delete groupMap; } delete taxaSum; for (int i = 0; i < outputNames.size(); i++) {	m->mothurRemove(outputNames[i]);	} delete classify; return 0; }
+        outTax << name << '\t' << newTax << endl;
+    }
 
-                inTax >> name; m->gobble(inTax);
-                taxon = m->getline(inTax); m->gobble(inTax);
+    inTax.close();
+    outTax.close();
 
-                string newTax = m->addUnclassifieds(taxon, maxLevel, probs);
+    m->mothurRemove(newTaxonomyFile);
+    m->renameFile(unclass, newTaxonomyFile);
 
-                outTax << name << '\t' << newTax << endl;
+    if (ct != NULL) { delete ct; }
+    if (groupMap != NULL) { delete groupMap; } delete taxaSum;
+    m->mothurRemove(tempTaxonomyFile);
 
+    m->mothurOutEndLine();
+    m->mothurOut("It took " + toString(time(NULL) - start) + " secs to create the summary file for " + toString(numFastaSeqs) + " sequences."); m->mothurOutEndLine(); m->mothurOutEndLine();
 
-                taxaSum->addSeqToTree(name, newTax);
-            }
-            inTax.close();
-            outTax.close();
-
-            m->mothurRemove(newTaxonomyFile);
-            m->renameFile(unclass, newTaxonomyFile);
-
-            if (m->control_pressed) {  outputTypes.clear(); if (ct != NULL) { delete ct; } if (groupMap != NULL) { delete groupMap; } for (int i = 0; i < outputNames.size(); i++) {	m->mothurRemove(outputNames[i]);	} delete classify; return 0; }
-
-            //print summary file
-            ofstream outTaxTree;
-            m->openOutputFile(taxSummary, outTaxTree);
-            taxaSum->print(outTaxTree, output);
-            outTaxTree.close();
-
-            if (ct != NULL) { delete ct; }
-            if (groupMap != NULL) { delete groupMap; } delete taxaSum;
-            m->mothurRemove(tempTaxonomyFile);
-
-            m->mothurOutEndLine();
-            m->mothurOut("It took " + toString(time(NULL) - start) + " secs to create the summary file for " + toString(numFastaSeqs) + " sequences."); m->mothurOutEndLine(); m->mothurOutEndLine();
-
-
-        delete classify;
-
-        m->mothurOutEndLine();
-        m->mothurOut("Output File Names: "); m->mothurOutEndLine();
-        for (int i = 0; i < outputNames.size(); i++) {	m->mothurOut(outputNames[i]); m->mothurOutEndLine();	}
-        m->mothurOutEndLine();
-
-		//set taxonomy file as new current taxonomyfile
-		string current = "";
-		itTypes = outputTypes.find("taxonomy");
-		if (itTypes != outputTypes.end()) {
-			if ((itTypes->second).size() != 0) { current = (itTypes->second)[0]; m->setTaxonomyFile(current); }
-		}
-
-		current = "";
-		itTypes = outputTypes.find("accnos");
-		if (itTypes != outputTypes.end()) {
-			if ((itTypes->second).size() != 0) { current = (itTypes->second)[0]; m->setAccnosFile(current); }
-		}
-
-
+    delete classify;
 
 		return 0;
 }
