@@ -8,14 +8,12 @@
  */
 
 #include "maturnal.h"
-#include "engine.hpp"
 #include "mothurout.h"
 
 #include "classifyseqscommand.h"
 
 /**************************************************************************************************/
 
-CommandFactory* CommandFactory::_uniqueInstance = 0;
 MothurOut* MothurOut::_uniqueInstance = 0;
 
 /***********************************************************************/
