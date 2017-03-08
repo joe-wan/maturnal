@@ -12,7 +12,7 @@
  
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "commandoptionparser.hpp"
 #include "command.hpp"
 #include "commandfactory.hpp"

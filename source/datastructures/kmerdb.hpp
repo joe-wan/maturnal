@@ -19,7 +19,7 @@
 
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "database.hpp"
 
 class KmerDB : public Database {

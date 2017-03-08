@@ -9,7 +9,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 /* This class is a representation of the groupfile.  It is used by all the shared commands to determine what group a 

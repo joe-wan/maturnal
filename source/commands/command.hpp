@@ -13,7 +13,7 @@
 /*This class is a parent to all the command classes.  */
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "optionparser.h"
 #include "validparameter.h"
 #include "mothurout.h"

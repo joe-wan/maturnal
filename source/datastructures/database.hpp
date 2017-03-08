@@ -13,7 +13,7 @@
 
 /* This class is a parent to blastdb, kmerdb, suffixdb.  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "sequence.hpp"
 
 /**************************************************************************************************/

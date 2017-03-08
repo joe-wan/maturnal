@@ -10,7 +10,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 #include "groupmap.h"
 #include "counttable.h"

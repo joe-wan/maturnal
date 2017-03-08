@@ -7,7 +7,7 @@
  *
  */
  
-#include "mothur.h"
+#include "maturnal.h"
 #include "engine.hpp"
 #include "mothurout.h"
 

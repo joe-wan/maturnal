@@ -18,7 +18,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "database.hpp"
 #include "suffixtree.hpp"
 

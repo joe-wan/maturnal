@@ -11,7 +11,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 
 class BlastDB : public Database {
 

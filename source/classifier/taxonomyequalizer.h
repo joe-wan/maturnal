@@ -11,7 +11,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 //reads in taxonomy file and makes all the taxonomies the same length 

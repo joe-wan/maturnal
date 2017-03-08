@@ -7,7 +7,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "sequence.hpp"
 #include "database.hpp"
 

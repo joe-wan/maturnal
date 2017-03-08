@@ -10,7 +10,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 
 /***********************************************/
 struct logger {
@@ -74,7 +74,7 @@ class MothurOut {
 		string saveNextLabel, mothurProgramPath, sharedHeaderMode, groupMode, testDirectory;
 		bool printedSharedHeaders, printedListHeaders, commandInputsConvertError, changedSeqNames, modifyNames;
 		
-		//functions from mothur.h
+		//functions from maturnal.h
 		//file operations
         bool dirCheck(string&); //completes path, appends appropriate / or \, makes sure dir is writable.
         bool dirCheck(string&, string); //completes path, appends appropriate / or \, makes sure dir is writable. - no error

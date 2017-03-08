@@ -2,7 +2,7 @@
 #define datavector_h
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 /* This class is parent to listvector, ordervector, rabundvector, sabundvector, sharedordervector, sharedrabundvector, sharedsabundvector. 

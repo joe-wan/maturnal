@@ -25,7 +25,7 @@
  *
  */
 
-#include "mothur.h"
+#include "maturnal.h"
 
 class SuffixNode;
 

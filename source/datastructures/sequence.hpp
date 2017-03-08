@@ -17,7 +17,7 @@
 
 //Data Structure for a fasta file.
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 
 

@@ -12,7 +12,7 @@
 
 
 
-#include "mothur.h"
+#include "maturnal.h"
 #include "mothurout.h"
 #include "command.hpp"
 
