@@ -194,9 +194,6 @@ ClassifySeqsCommand::ClassifySeqsCommand(map<string, string> parameters) {
 	temp = validParameter.validFile(parameters, "iters", false);		if (temp == "not found") { temp = "100";			}
 	m->mothurConvert(temp, iters);
 
-				output = validParameter.validFile(parameters, "output", false);		if(output == "not found"){	output = "detail"; }
-	if ((output != "simple") && (output != "detail")) { m->mothurOut(output + " is not a valid output form. Options are simple and detail. I will use detail."); m->mothurOutEndLine(); output = "detail"; }
-
 	if ((method == "wang") && (search != "kmer"))  {
 		m->mothurOut("The wang method requires the kmer search. " + search + " will be disregarded, and kmer will be used." ); m->mothurOutEndLine();
 		search = "kmer";

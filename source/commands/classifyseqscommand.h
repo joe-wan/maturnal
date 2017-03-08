@@ -59,7 +59,7 @@ private:
 
 	Classify* classify;
 
-	string fastaFileName, templateFileName, search, method, taxonomyFileName, output;
+	string fastaFileName, templateFileName, search, method, taxonomyFileName;
 	int processors, kmerSize, numWanted, cutoff, iters, printlevel;
 	float match, misMatch, gapOpen, gapExtend;
 	bool abort, probs, save, flip, writeShortcuts, relabund, keepAccnos;
