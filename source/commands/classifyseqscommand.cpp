@@ -201,9 +201,6 @@ int ClassifySeqsCommand::execute(){
     //read taxfile - this reading and rewriting is done to preserve the confidence scores.
     string name, taxon;
     string group = "";
-    GroupMap* groupMap = NULL;
-    CountTable* ct = NULL;
-    PhyloSummary* taxaSum;
 
     while (!inTax.eof()) {
         inTax >> name; m->gobble(inTax);
@@ -220,8 +217,6 @@ int ClassifySeqsCommand::execute(){
     m->mothurRemove(outTax);
     m->renameFile(unclass, outTax);
 
-    if (ct != NULL) { delete ct; }
-    if (groupMap != NULL) { delete groupMap; } delete taxaSum;
     m->mothurRemove(tempTaxonomyFile);
 
     m->mothurOutEndLine();

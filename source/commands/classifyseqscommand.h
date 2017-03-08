@@ -15,7 +15,6 @@
 #include "sequence.hpp"
 #include "bayesian.h"
 #include "phylotree.h"
-#include "phylosummary.h"
 #include "knn.h"
 #include "kmertree.h"
 #include "aligntree.h"
