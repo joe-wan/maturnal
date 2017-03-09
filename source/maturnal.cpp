@@ -28,9 +28,19 @@ int main(int argc, char *argv[]){
 	m->setVersion(mothurVersion);
 
 	// Set up the argument parser
-	args::ArgumentParser parser("This is a test program.", "This goes after the options.");
+	args::ArgumentParser parser(std::string() + "A command-line utility for " +
+		"classifying marker gene amplicons, repackaged from the mothur source " +
+		"code.\n\n" +
+		"Basic usage (uses default naive Bayesian classifier):\n\n" +
+		"    maturnal --input [INPUT FASTA] --reference [TRAINING FASTA] \\\n" +
+		"        --taxonomy [TRAINING TAXONOMY] --output [CLASSIFICATION OUTPUT]\n\n" +
+		"Please cite the creators of mothur and of the RDP Classifier. For the "
+		"full citation, type:\n\n" +
+		"    maturnal --cite");
   parser.LongSeparator(" ");
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
+	args::Flag cite(parser, "cite", "Display citation information.",
+		{'c', "cite"});
 
 	args::Group inputGroup(parser, "Input:");
 	args::ValueFlag<string> fastaF(inputGroup, "FILE",
@@ -109,6 +119,24 @@ int main(int argc, char *argv[]){
 	    return 1;
 	}
 
+	if (args::get(cite)) {
+			std::string citeMessage = std::string() +
+				"When using, please cite:\n\n"
+				"Schloss, P.D., et al., Introducing mothur: Open-source, " +
+				"platform-independent, community-supported software for describing " +
+				"and comparing microbial communities. Appl Environ Microbiol, 2009. " +
+				"75(23):7537-41.\n\n" +
+				"For the naive Bayesian classifier (the default algorithm, " +
+				"\"--method wang\"), cite:\n\n" +
+				"Wang Q, Garrity GM, Tiedje JM, Cole JR (2007). Naive Bayesian " +
+				"classifier for rapid assignment of rRNA sequences into the new " +
+				"bacterial taxonomy. Appl Environ Microbiol 73: 5261-7.";
+			for (const std::string line : args::Wrap(citeMessage, 80)) {
+				std::cout << line << std::endl;
+			}
+			return 0;
+	}
+
 	// Store the arguments
 	string fasta = args::get(fastaF);
 	string taxonomy = args::get(taxonomyF);
@@ -124,14 +152,35 @@ int main(int argc, char *argv[]){
 	int numwanted = args::get(numwantedF);
 	int processors = args::get(processorsF);
 	int printlevel = args::get(printlevelF);
-	bool probs = !args::get(noProbsF);
+	bool probs = !args::get(noProbsF); // This flag is "true" when chosen
 	float match = args::get(matchF);
 	float mismatch = args::get(mismatchF);
 	float gapopen = args::get(gapopenF);
 	float gapextend = args::get(gapextendF);
-	bool flip = !args::get(noFlipF);
+	bool flip = !args::get(noFlipF); // This flag is "true" when chosen
 
-	// TODO: Validate arguments
+	// Validate arguments
+	if (fasta.size() == 0) {
+		std::cerr << "ERROR: you must specify an input FASTA file " <<
+			"(--input [FILE])." << std::endl << std::endl;
+		std::cerr << parser;
+		return 1;
+	} else if (reference.size() == 0) {
+		std::cerr << "ERROR: you must specify a training set FASTA file " <<
+			"(--reference [FILE])." << std::endl << std::endl;
+		std::cerr << parser;
+		return 1;
+	} else if (taxonomy.size() == 0) {
+		std::cerr << "ERROR: you must specify a training set taxonomy file " <<
+			"(--taxonomy [FILE])." << std::endl << std::endl;
+		std::cerr << parser;
+		return 1;
+	} else if (output.size() == 0) {
+		std::cerr << "ERROR: you must specify an output file " <<
+			"(--output [FILE])." << std::endl << std::endl;
+		std::cerr << parser;
+		return 1;
+	}
 
 	// Run the classifier
 	ClassifySeqsCommand command = ClassifySeqsCommand(fasta, taxonomy, reference,

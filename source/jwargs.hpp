@@ -6,7 +6,6 @@
 #include "args.hxx"
 
 namespace jwargs {
-   std::map<std::string, std::string> argvToMap(int argc, char *argv[]);
 
    class ChoiceFlag : public args::ValueFlag<std::string> {
      private:

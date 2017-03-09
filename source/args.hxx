@@ -93,6 +93,12 @@ namespace args
      */
     std::vector<std::string> Wrap(const std::string &in, const std::string::size_type width, std::string::size_type firstlinewidth = 0)
     {
+        // Preserve empty lines
+        if (in.size() == 0) {
+            std::vector<std::string> result = std::vector<std::string>();
+            result.push_back("");
+            return result;
+        }
         // Preserve existing line breaks
         const auto newlineloc = in.find('\n');
         if (newlineloc != in.npos)
@@ -105,13 +111,17 @@ namespace args
                 std::make_move_iterator(std::end(second)));
             return first;
         }
+        // First, save any whitespace
+        auto next_text = in.find_first_not_of("\r\n\t ");
+        std::string spaces = (next_text != in.npos) ? in.substr(0, next_text) : "";
+        std::string in_ = (next_text != in.npos) ? in.substr(next_text) : std::string(in);
         if (firstlinewidth == 0)
         {
             firstlinewidth = width;
         }
         auto currentwidth = firstlinewidth;
 
-        std::istringstream stream(in);
+        std::istringstream stream(in_);
         std::vector<std::string> output;
         std::ostringstream line;
         std::string::size_type linesize = 0;
@@ -119,6 +129,8 @@ namespace args
         {
             std::string item;
             stream >> item;
+            item = std::string(spaces) + item;
+            spaces = "";
             auto itemsize = Glyphs(item);
             if ((linesize + 1 + itemsize) > currentwidth)
             {
