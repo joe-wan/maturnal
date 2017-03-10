@@ -28,14 +28,14 @@ int main(int argc, char *argv[]){
 	m->setVersion(mothurVersion);
 
 	// Set up the argument parser
-	args::ArgumentParser parser(std::string() + "A command-line utility for " +
-		"classifying marker gene amplicons, repackaged from the mothur source " +
-		"code.\n\n" +
-		"Basic usage (uses default naive Bayesian classifier):\n\n" +
-		"    maturnal --input [INPUT FASTA] --reference [TRAINING FASTA] \\\n" +
-		"        --taxonomy [TRAINING TAXONOMY] --output [CLASSIFICATION OUTPUT]\n\n" +
+	args::ArgumentParser parser(std::string() + "A command-line utility for "
+		"classifying marker gene amplicons, repackaged from the mothur source "
+		"code.\n\n"
+		"Basic usage (uses default naive Bayesian classifier):\n\n"
+		"    maturnal --input [INPUT FASTA] --reference [TRAINING FASTA] \\\n"
+		"        --taxonomy [TRAINING TAXONOMY] --output [CLASSIFICATION OUTPUT]\n\n"
 		"Please cite the creators of mothur and of the RDP Classifier. For the "
-		"full citation, type:\n\n" +
+		"full citation, type:\n\n"
 		"    maturnal --cite");
   parser.LongSeparator(" ");
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
@@ -44,54 +44,74 @@ int main(int argc, char *argv[]){
 
 	args::Group inputGroup(parser, "Input:");
 	args::ValueFlag<string> fastaF(inputGroup, "FILE",
-		"Input FASTA file.", {"fasta", 'i'});
+		"Input FASTA file (REQUIRED).",
+		{"fasta", 'i'});
 	args::ValueFlag<string> taxonomyF(inputGroup, "FILE",
-		"Path to taxonomy file for training set.", {"taxonomy"});
+		"Path to taxonomy file for training set (REQUIRED).",
+		{"taxonomy"});
 	args::ValueFlag<string> referenceF(inputGroup, "FILE",
-		"Path to reference (FASTA) file for training set.", {"reference"});
+		"Path to reference (FASTA) file for training set (REQUIRED).",
+		{"reference"});
 
 	args::Group outputGroup(parser, "Output:");
 	args::ValueFlag<string> outputF(outputGroup, "FILE",
-		"Output taxonomy", {'o', "output"});
+		"Output taxonomy file (REQUIRED).",
+		{'o', "output"});
 	args::ValueFlag<string> outputFlippedF(outputGroup, "FILE",
-		"", {"output_flipped"});
+		"Optional \"flipped\" output file containing the IDs of sequences that "
+		"were reverse-complemented for better classification (if the --no_flip "
+		"flag is set, the file will be empty).",
+		{"output_flipped"});
 	args::ValueFlag<string> outputMatchdistF(outputGroup, "FILE",
-		"", {"output_matchdist"});
+		"Optional output file showing distances for the k-nearest neighbor "
+		"algorithm. Only used if \"--method knn\" and \"--search distance\" are "
+		"specified.",
+		{"output_matchdist"});
 
 	args::Group classifyGroup(parser, "Classification method:");
 	jwargs::ChoiceFlag methodF(classifyGroup, "METHOD",
-		"Classification method to use. Options are: wang, knn and zap. Default: wang",
+		"Classification method to use. Options are: wang, knn and zap. "
+		"Default: wang (a naive Bayesian classifier, similar to RDP)",
 		{"method"}, {"wang", "knn", "zap"}, "wang");
 	jwargs::ChoiceFlag searchF(classifyGroup, "SEARCH",
-		"The method to find most similar template. Options are: suffix, kmer, blast, align, distance. Default: kmer",
+		"The method to find most similar template. Options are: "
+		"suffix, kmer, blast, align, distance. Default: 8",
 		{"search"}, {"suffix", "kmer", "blast", "align", "distance"}, "kmer");
 	args::ValueFlag<int> ksizeF(classifyGroup, "KSIZE",
-		"If --method is set to kmer, this option specifies kmer length. Default: 8",
+		"If --method is set to kmer, this option specifies kmer length. "
+		"Default: 8",
 		{"ksize"}, 8);
 
 	args::Group classifyOptionsGroup(parser, "Classifier options:");
 	args::ValueFlag<int> cutoffF(classifyOptionsGroup, "CUTOFF",
-		"", {"cutoff"}, 80);
+		"Minimum bootstrap confidence score required to classify a sequence. "
+		"Default: 80",
+		{"cutoff"}, 80);
 	args::ValueFlag<int> itersF(classifyOptionsGroup, "ITERS",
-		"", {"iters"}, 100);
+		"Number of bootstrapping iterations used to determine confidence scores. "
+		"Default: 100",
+		{"iters"}, 100);
 	args::ValueFlag<int> numwantedF(classifyOptionsGroup, "NUMWANTED",
-		"If --method is knn, this option specifies the number (k) of database matches to consider.",
+		"If --method is knn, this option specifies the number (k) of database "
+		"matches to consider. Default: 10",
 		{"numwanted"}, 10);
 	args::ValueFlag<int> processorsF(classifyOptionsGroup, "PROCESSORS",
 		"Number of processors. Default: 1", {"processors"}, 1);
 	args::Flag noFlipF(classifyOptionsGroup, "",
-		"If specified, don't try reverse complement of sequences.",
+		"If specified, don't try reverse complement of sequences for a better "
+		"match.",
 		{"no_flip"});
 
 	args::Group outFormatGroup(parser, "Output format:");
 	args::ValueFlag<int> printlevelF(outFormatGroup, "PRINTLEVEL",
-		"The number of taxonomic levels to include in the output taxonomy file.",
+		"The number of taxonomic levels to include in the output taxonomy file. "
+		"Default: all levels",
 		{"printlevel"}, -1);
 	args::Flag noProbsF(outFormatGroup, "",
 		"If specified, omit bootsrapping probability from output file.",
 		{"no_probs"});
 
-	args::Group alignGroup(parser, "Alignment options \n(for --search blast):");
+	args::Group alignGroup(parser, "Alignment options\n    (for --search blast):");
 	args::ValueFlag<float> matchF(alignGroup, "MATCH",
 		"Match score. Default: 1.0", {"match"}, 1.0);
 	args::ValueFlag<float> mismatchF(alignGroup, "MISMATCH",
@@ -120,16 +140,16 @@ int main(int argc, char *argv[]){
 	}
 
 	if (args::get(cite)) {
-			std::string citeMessage = std::string() +
+			std::string citeMessage =
 				"When using, please cite:\n\n"
-				"Schloss, P.D., et al., Introducing mothur: Open-source, " +
-				"platform-independent, community-supported software for describing " +
-				"and comparing microbial communities. Appl Environ Microbiol, 2009. " +
-				"75(23):7537-41.\n\n" +
-				"For the naive Bayesian classifier (the default algorithm, " +
-				"\"--method wang\"), cite:\n\n" +
-				"Wang Q, Garrity GM, Tiedje JM, Cole JR (2007). Naive Bayesian " +
-				"classifier for rapid assignment of rRNA sequences into the new " +
+				"Schloss, P.D., et al., Introducing mothur: Open-source, "
+				"platform-independent, community-supported software for describing "
+				"and comparing microbial communities. Appl Environ Microbiol, 2009. "
+				"75(23):7537-41.\n\n"
+				"For the naive Bayesian classifier (the default algorithm, "
+				"\"--method wang\"), cite:\n\n"
+				"Wang Q, Garrity GM, Tiedje JM, Cole JR (2007). Naive Bayesian "
+				"classifier for rapid assignment of rRNA sequences into the new "
 				"bacterial taxonomy. Appl Environ Microbiol 73: 5261-7.";
 			for (const std::string line : args::Wrap(citeMessage, 80)) {
 				std::cout << line << std::endl;
